@@ -33,6 +33,9 @@ public class Hotel {
     @Column(nullable = false)
     private Boolean active;
 
+    @Embedded
+    private ContactInfo contactInfo;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -40,10 +43,11 @@ public class Hotel {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @Embedded
-    private ContactInfo contactInfo; // contact_info_complete_address, contact_info_phone_number
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
-    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-    private List<Room> rooms;
+//    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+//    private List<Room> rooms;
 
 }
