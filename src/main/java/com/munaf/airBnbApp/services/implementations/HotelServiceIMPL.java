@@ -55,8 +55,7 @@ public class HotelServiceIMPL implements HotelService {
     @Override
     public Boolean deleteHotelById(Long hotelId) {
         log.info("Deleting a hotel with Id : {}", hotelId);
-        boolean isHotelExists = hotelRepository.existsById(hotelId);
-        if (!isHotelExists) throw new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId);
+        if (!hotelRepository.existsById(hotelId)) throw new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId);
         hotelRepository.deleteById(hotelId);
         return true;
     }

@@ -1,5 +1,5 @@
 package com.munaf.airBnbApp.services;
 
-public interface InventoryInterface {
+public interface InventoryService {
 
 }
