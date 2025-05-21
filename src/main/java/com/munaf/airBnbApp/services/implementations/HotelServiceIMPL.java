@@ -2,22 +2,27 @@ package com.munaf.airBnbApp.services.implementations;
 
 import com.munaf.airBnbApp.dtos.HotelDto;
 import com.munaf.airBnbApp.entities.Hotel;
+import com.munaf.airBnbApp.exceptions.InvalidInputException;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
 import com.munaf.airBnbApp.repositories.HotelRepository;
 import com.munaf.airBnbApp.services.HotelService;
+import com.munaf.airBnbApp.services.InventoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 public class HotelServiceIMPL implements HotelService {
 
     private final HotelRepository hotelRepository;
+    private final InventoryService inventoryService;
     private final ModelMapper modelMapper;
 
-    public HotelServiceIMPL(HotelRepository hotelRepository, ModelMapper modelMapper) {
+    public HotelServiceIMPL(HotelRepository hotelRepository, InventoryService inventoryService, ModelMapper modelMapper) {
         this.hotelRepository = hotelRepository;
+        this.inventoryService = inventoryService;
         this.modelMapper = modelMapper;
     }
 
@@ -53,20 +58,32 @@ public class HotelServiceIMPL implements HotelService {
     }
 
     @Override
+    @Transactional
     public Boolean deleteHotelById(Long hotelId) {
         log.info("Deleting a hotel with Id : {}", hotelId);
-        if (!hotelRepository.existsById(hotelId)) throw new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId);
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId));
+
+        // Delete all future inventories
+        hotel.getRooms().forEach(room -> inventoryService.deleteFutureInventories(room));
+
         hotelRepository.deleteById(hotelId);
         return true;
     }
 
     @Override
+    @Transactional
     public HotelDto activateHotel(Long hotelId) {
         log.info("Activating a hotel with Id : {}", hotelId);
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId));
+        if (hotel.getActive()) throw new InvalidInputException("Hotel Already Activated With Id : " + hotelId);
         hotel.setActive(true);
         hotel = hotelRepository.save(hotel);
+
+        // Initialize inventory for all room in this hotel for a year
+        hotel.getRooms().forEach(room -> inventoryService.initializeRoomForAYear(room));
+
 
         return modelMapper.map(hotel, HotelDto.class);
     }

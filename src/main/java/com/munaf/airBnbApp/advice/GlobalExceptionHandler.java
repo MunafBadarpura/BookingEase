@@ -1,5 +1,6 @@
 package com.munaf.airBnbApp.advice;
 
+import com.munaf.airBnbApp.exceptions.InvalidInputException;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,15 @@ public class GlobalExceptionHandler {
                 .build();
 
         return buildErrorResponseEntity(apiError, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<ApiResponse<?>> handleInvalidInputException(InvalidInputException e) {
+        ApiError apiError = ApiError.builder()
+                .message(e.getMessage())
+                .build();
+
+        return buildErrorResponseEntity(apiError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

@@ -6,10 +6,12 @@ import com.munaf.airBnbApp.entities.Room;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
 import com.munaf.airBnbApp.repositories.HotelRepository;
 import com.munaf.airBnbApp.repositories.RoomRepository;
+import com.munaf.airBnbApp.services.InventoryService;
 import com.munaf.airBnbApp.services.RoomService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,15 +21,18 @@ public class RoomServiceIMPL implements RoomService {
 
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
+    private final InventoryService inventoryService;
     private final ModelMapper modelMapper;
 
-    public RoomServiceIMPL(RoomRepository roomRepository, HotelRepository hotelRepository, ModelMapper modelMapper) {
+    public RoomServiceIMPL(RoomRepository roomRepository, HotelRepository hotelRepository, InventoryService inventoryService, ModelMapper modelMapper) {
         this.roomRepository = roomRepository;
         this.hotelRepository = hotelRepository;
+        this.inventoryService = inventoryService;
         this.modelMapper = modelMapper;
     }
 
     @Override
+    @Transactional
     public RoomDto createNewRoomInHotel(Long hotelId, RoomDto roomDto) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId));
@@ -35,7 +40,12 @@ public class RoomServiceIMPL implements RoomService {
         Room room = modelMapper.map(roomDto, Room.class);
         room.setHotel(hotel);
         room = roomRepository.save(room);
-        // TODO : create inventory as soon as room is created and hotel is active
+
+        // create inventory as soon as room is created and hotel is active
+        if (hotel.getActive()) {
+            inventoryService.initializeRoomForAYear(room);
+        }
+
         return modelMapper.map(room, RoomDto.class);
     }
 
@@ -56,15 +66,20 @@ public class RoomServiceIMPL implements RoomService {
 //        return modelMapper.map(room, RoomDto.class);
 
         Room room = roomRepository.findByIdAndHotel_Id(roomId, hotelId)
-                .orElseThrow(() -> new ResourceNotFoundException("Room Not Found With Id : " + roomId + " For Hotel Id :" + hotelId));
+                .orElseThrow(() -> new ResourceNotFoundException("Room Not Found With Id : " + roomId + " For Hotel Id : " + hotelId));
         return modelMapper.map(room, RoomDto.class);
     }
 
     @Override
-    public Boolean deleteHotelIdAndRoomById(Long hotelId, Long roomId) {
-        if (!roomRepository.existsByIdAndHotel_Id(roomId, hotelId)) throw new ResourceNotFoundException("Room Not Found With Id : " + roomId + " For Hotel Id :" + hotelId);
+    @Transactional
+    public Boolean deleteRoomByHotelIdAndRoomId(Long hotelId, Long roomId) {
+        Room room = roomRepository.findByIdAndHotel_Id(roomId, hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room Not Found With Id : " + roomId + " For Hotel Id : " + hotelId));
+
+        // Delete future inventories for this room
+        inventoryService.deleteFutureInventories(room);
+
         roomRepository.deleteById(roomId);
         return true;
-        // TODO : delete future inventories for this room
     }
 }

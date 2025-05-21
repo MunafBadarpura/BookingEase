@@ -12,6 +12,6 @@ public interface RoomService {
 
     RoomDto getRoomByHotelIdAndRoomId(Long hotelId, Long roomId);
 
-    Boolean deleteHotelIdAndRoomById(Long hotelId, Long roomId);
+    Boolean deleteRoomByHotelIdAndRoomId(Long hotelId, Long roomId);
 
 }
