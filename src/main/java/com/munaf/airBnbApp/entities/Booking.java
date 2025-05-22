@@ -34,7 +34,7 @@ public class Booking {
     private User user;
 
     @Column(nullable = false)
-    private Integer roomCount;
+    private Integer numberOfRooms; // roomCount
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

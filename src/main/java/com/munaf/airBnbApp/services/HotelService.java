@@ -1,6 +1,7 @@
 package com.munaf.airBnbApp.services;
 
 import com.munaf.airBnbApp.dtos.HotelDto;
+import com.munaf.airBnbApp.dtos.HotelInfoDto;
 
 public interface HotelService {
 
@@ -13,4 +14,6 @@ public interface HotelService {
     Boolean deleteHotelById(Long hotelId);
 
     HotelDto activateHotel(Long hotelId);
+
+    HotelInfoDto getHotelInfoById(Long hotelId);
 }

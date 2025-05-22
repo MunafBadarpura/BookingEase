@@ -76,8 +76,8 @@ public class RoomServiceIMPL implements RoomService {
         Room room = roomRepository.findByIdAndHotel_Id(roomId, hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room Not Found With Id : " + roomId + " For Hotel Id : " + hotelId));
 
-        // Delete future inventories for this room
-        inventoryService.deleteFutureInventories(room);
+        // Delete inventories for this room
+        inventoryService.deleteAllInventoriesForRoom(room);
 
         roomRepository.deleteById(roomId);
         return true;

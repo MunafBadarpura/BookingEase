@@ -23,12 +23,12 @@ public class RoomController {
         return new ResponseEntity<>(roomService.createNewRoomInHotel(hotelId, roomDto), HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping // also for guest/user
     ResponseEntity<List<RoomDto>> getAllRoomByHotelId(@PathVariable Long hotelId) {
         return new ResponseEntity<>(roomService.getAllRoomByHotelId(hotelId), HttpStatus.OK);
     }
 
-    @GetMapping("/{roomId}")
+    @GetMapping("/{roomId}") // also for guest/user
     ResponseEntity<RoomDto> getRoomByHotelIdAndRoomId(@PathVariable Long hotelId, @PathVariable Long roomId) {
         return new ResponseEntity<>(roomService.getRoomByHotelIdAndRoomId(hotelId, roomId), HttpStatus.OK);
     }

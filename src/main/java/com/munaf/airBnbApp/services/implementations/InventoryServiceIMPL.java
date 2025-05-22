@@ -1,21 +1,31 @@
 package com.munaf.airBnbApp.services.implementations;
 
+import com.munaf.airBnbApp.dtos.HotelDto;
+import com.munaf.airBnbApp.dtos.HotelSearchRequest;
+import com.munaf.airBnbApp.entities.Hotel;
 import com.munaf.airBnbApp.entities.Inventory;
 import com.munaf.airBnbApp.entities.Room;
 import com.munaf.airBnbApp.repositories.InventoryRepository;
 import com.munaf.airBnbApp.services.InventoryService;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class InventoryServiceIMPL implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
+    private final ModelMapper modelMapper;
 
-    public InventoryServiceIMPL(InventoryRepository inventoryRepository) {
+    public InventoryServiceIMPL(InventoryRepository inventoryRepository, ModelMapper modelMapper) {
         this.inventoryRepository = inventoryRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -43,8 +53,36 @@ public class InventoryServiceIMPL implements InventoryService {
     }
 
     @Override
-    public void deleteFutureInventories(Room room) {
+    public void deleteAllInventoriesForRoom(Room room) {
+        inventoryRepository.deleteByRoom(room);
+    }
+
+    @Override
+    public Page<HotelDto> searchHotel(HotelSearchRequest hotelSearchRequest, Integer pageNo, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+        Long dateCount = ChronoUnit.DAYS.between(hotelSearchRequest.getStartDate(), hotelSearchRequest.getEndDate()) + 1; // 12-20 = 9
+
+        Page<Hotel> hotelPage = inventoryRepository.findHotelsWithAvailableInventory(
+                hotelSearchRequest.getCity(),
+                hotelSearchRequest.getNumberOfRooms(),
+                hotelSearchRequest.getStartDate(),
+                hotelSearchRequest.getEndDate(),
+                dateCount,
+                pageable
+        );
+
+        return hotelPage.map(hotel -> modelMapper.map(hotel, HotelDto.class));
+
+        // ChronoUnit
+        // query
+    }
+
+    @Override
+    public Page<HotelDto> getAllHotels(Integer pageNo, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
         LocalDate today = LocalDate.now();
-        inventoryRepository.deleteByDateAfterAndRoom(today, room);
+
+        Page<Hotel> hotelPage = inventoryRepository.findAllHotelsWithAvailableInventory(today, pageable);
+        return hotelPage.map(hotel -> modelMapper.map(hotel, HotelDto.class));
     }
 }
