@@ -53,10 +53,6 @@ public class Booking {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "booking_guest",

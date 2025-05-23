@@ -23,6 +23,10 @@ public class Payment {
     @Column(unique = true, nullable = false)
     private String transactionId;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
+
     @Column(nullable = false)
     private BigDecimal amount = BigDecimal.valueOf(0);
 

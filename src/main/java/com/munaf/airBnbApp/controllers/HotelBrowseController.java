@@ -44,5 +44,4 @@ public class HotelBrowseController {
         return new ResponseEntity<>(hotelService.getHotelInfoById(hotelId), HttpStatus.OK);
     }
 
-
 }
