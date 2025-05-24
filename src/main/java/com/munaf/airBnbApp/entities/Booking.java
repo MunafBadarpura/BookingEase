@@ -2,17 +2,20 @@ package com.munaf.airBnbApp.entities;
 
 import com.munaf.airBnbApp.entities.enums.BookingStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "booking")
 public class Booking {
@@ -45,6 +48,9 @@ public class Booking {
 
     @Column(nullable = false)
     private LocalDate checkOutDate;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal amount;
 
     @CreationTimestamp
     @Column(updatable = false)

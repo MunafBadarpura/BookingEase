@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class InventoryServiceIMPL implements InventoryService {
@@ -28,10 +30,12 @@ public class InventoryServiceIMPL implements InventoryService {
         this.modelMapper = modelMapper;
     }
 
+
     @Override
     public void initializeRoomForAYear(Room room) {
         LocalDate today = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusYears(1);
+        List<Inventory> inventories = new ArrayList<>();
 
         while (!today.isAfter(endDate)) { // today!= endDate
             Inventory inventory = Inventory.builder()
@@ -41,14 +45,15 @@ public class InventoryServiceIMPL implements InventoryService {
                     .date(today)
                     .price(room.getBasePrice())
                     .bookedCount(0)
+                    .reservedCount(0)
                     .totalCount(room.getTotalCount())
                     .surgeFactor(BigDecimal.ONE)
                     .closed(false)
                     .build();
-            inventoryRepository.save(inventory);
-
+            inventories.add(inventory);
             today = today.plusDays(1);
         }
+        inventoryRepository.saveAll(inventories);
 
     }
 

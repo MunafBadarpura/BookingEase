@@ -12,9 +12,9 @@ public class BookingDto {
 
     private Long id;
 
-    private HotelDto hotelDto;
+    // private HotelDto hotelDto;
 
-    private RoomDto roomDto;
+    // private RoomDto roomDto;
 
     private UserDto userDto;
 

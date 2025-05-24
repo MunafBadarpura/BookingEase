@@ -32,6 +32,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(apiError, HttpStatus.BAD_REQUEST);
     }
 
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<?>> handleIllegalStateException(IllegalStateException e) {
+        ApiError apiError = ApiError.builder()
+                .message(e.getMessage())
+                .build();
+
+        return buildErrorResponseEntity(apiError, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handlerException(Exception e) {
         ApiError apiError = ApiError.builder()
