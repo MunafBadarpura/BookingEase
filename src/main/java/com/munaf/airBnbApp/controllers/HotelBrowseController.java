@@ -2,6 +2,7 @@ package com.munaf.airBnbApp.controllers;
 
 import com.munaf.airBnbApp.dtos.HotelDto;
 import com.munaf.airBnbApp.dtos.HotelInfoDto;
+import com.munaf.airBnbApp.dtos.HotelPriceDto;
 import com.munaf.airBnbApp.dtos.HotelSearchRequest;
 import com.munaf.airBnbApp.services.HotelService;
 import com.munaf.airBnbApp.services.InventoryService;
@@ -26,22 +27,37 @@ public class HotelBrowseController {
     }
 
     @GetMapping("/searchAll")
-    public ResponseEntity<Page<HotelDto>> getAllHotels(@RequestParam(required = false, defaultValue = "1") Integer pageNo,
+    public ResponseEntity<Page<HotelPriceDto>> getAllHotels(@RequestParam(required = false, defaultValue = "1") Integer pageNo,
                                                        @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         return new ResponseEntity<>(inventoryService.getAllHotels(pageNo, pageSize), HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<HotelDto>> searchHotel(@RequestBody HotelSearchRequest hotelSearchRequest,
-                                      @RequestParam(required = false, defaultValue = "1") Integer pageNo,
-                                      @RequestParam(required = false, defaultValue = "10") Integer pageSize
+    public ResponseEntity<Page<HotelPriceDto>> searchHotel(@RequestBody HotelSearchRequest hotelSearchRequest,
+                                                           @RequestParam(required = false, defaultValue = "1") Integer pageNo,
+                                                           @RequestParam(required = false, defaultValue = "10") Integer pageSize
                                       ) {
         return new ResponseEntity<>(inventoryService.searchHotel(hotelSearchRequest, pageNo, pageSize), HttpStatus.OK);
     }
+
 
     @GetMapping("/info/{hotelId}")
     public ResponseEntity<HotelInfoDto> getHotelInfoById(@PathVariable Long hotelId) {
         return new ResponseEntity<>(hotelService.getHotelInfoById(hotelId), HttpStatus.OK);
     }
 
+
+//    @GetMapping("/search")
+//    public ResponseEntity<Page<HotelDto>> searchHotel(@RequestBody HotelSearchRequest hotelSearchRequest,
+//                                                      @RequestParam(required = false, defaultValue = "1") Integer pageNo,
+//                                                      @RequestParam(required = false, defaultValue = "10") Integer pageSize
+//    ) {
+//        return new ResponseEntity<>(inventoryService.searchHotel(hotelSearchRequest, pageNo, pageSize), HttpStatus.OK);
+//    }
+
+//    @GetMapping("/searchAll")
+//    public ResponseEntity<Page<HotelDto>> getAllHotels(@RequestParam(required = false, defaultValue = "1") Integer pageNo,
+//                                                       @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+//        return new ResponseEntity<>(inventoryService.getAllHotels(pageNo, pageSize), HttpStatus.OK);
+//    }
 }

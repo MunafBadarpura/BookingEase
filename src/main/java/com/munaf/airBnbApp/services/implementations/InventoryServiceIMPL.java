@@ -1,10 +1,13 @@
 package com.munaf.airBnbApp.services.implementations;
 
 import com.munaf.airBnbApp.dtos.HotelDto;
+import com.munaf.airBnbApp.dtos.HotelPriceDto;
 import com.munaf.airBnbApp.dtos.HotelSearchRequest;
 import com.munaf.airBnbApp.entities.Hotel;
+import com.munaf.airBnbApp.entities.HotelMinPrice;
 import com.munaf.airBnbApp.entities.Inventory;
 import com.munaf.airBnbApp.entities.Room;
+import com.munaf.airBnbApp.repositories.HotelMinPriceRepository;
 import com.munaf.airBnbApp.repositories.InventoryRepository;
 import com.munaf.airBnbApp.services.InventoryService;
 import org.modelmapper.ModelMapper;
@@ -23,10 +26,12 @@ import java.util.List;
 public class InventoryServiceIMPL implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
+    private final HotelMinPriceRepository hotelMinPriceRepository;
     private final ModelMapper modelMapper;
 
-    public InventoryServiceIMPL(InventoryRepository inventoryRepository, ModelMapper modelMapper) {
+    public InventoryServiceIMPL(InventoryRepository inventoryRepository, HotelMinPriceRepository hotelMinPriceRepository, ModelMapper modelMapper) {
         this.inventoryRepository = inventoryRepository;
+        this.hotelMinPriceRepository = hotelMinPriceRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -62,12 +67,30 @@ public class InventoryServiceIMPL implements InventoryService {
         inventoryRepository.deleteByRoom(room);
     }
 
+//    @Override
+//    public Page<HotelDto> searchHotel(HotelSearchRequest hotelSearchRequest, Integer pageNo, Integer pageSize) {
+//        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+//        Long dateCount = ChronoUnit.DAYS.between(hotelSearchRequest.getStartDate(), hotelSearchRequest.getEndDate()) + 1; // 12-20 = 9
+//
+//        Page<Hotel> hotelPage = inventoryRepository.findHotelsWithAvailableInventory(
+//                hotelSearchRequest.getCity(),
+//                hotelSearchRequest.getNumberOfRooms(),
+//                hotelSearchRequest.getStartDate(),
+//                hotelSearchRequest.getEndDate(),
+//                dateCount,
+//                pageable
+//        );
+//
+//        return hotelPage.map(hotel -> modelMapper.map(hotel, HotelDto.class));
+//    }
+
+
     @Override
-    public Page<HotelDto> searchHotel(HotelSearchRequest hotelSearchRequest, Integer pageNo, Integer pageSize) {
+    public Page<HotelPriceDto> searchHotel(HotelSearchRequest hotelSearchRequest, Integer pageNo, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNo-1, pageSize);
         Long dateCount = ChronoUnit.DAYS.between(hotelSearchRequest.getStartDate(), hotelSearchRequest.getEndDate()) + 1; // 12-20 = 9
 
-        Page<Hotel> hotelPage = inventoryRepository.findHotelsWithAvailableInventory(
+        Page<HotelPriceDto> hotelPriceDtoPage = hotelMinPriceRepository.findHotelsWithAvailableInventory(
                 hotelSearchRequest.getCity(),
                 hotelSearchRequest.getNumberOfRooms(),
                 hotelSearchRequest.getStartDate(),
@@ -76,18 +99,23 @@ public class InventoryServiceIMPL implements InventoryService {
                 pageable
         );
 
-        return hotelPage.map(hotel -> modelMapper.map(hotel, HotelDto.class));
-
-        // ChronoUnit
-        // query
+        return hotelPriceDtoPage;
     }
 
-    @Override
-    public Page<HotelDto> getAllHotels(Integer pageNo, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-        LocalDate today = LocalDate.now();
+//    @Override
+//    public Page<HotelDto> getAllHotels(Integer pageNo, Integer pageSize) {
+//        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+//
+//        Page<Hotel> hotelPage = inventoryRepository.findAllHotelsWithAvailableInventory(LocalDate.now(), pageable);
+//        return hotelPage.map(hotel -> modelMapper.map(hotel, HotelDto.class));
+//    }
 
-        Page<Hotel> hotelPage = inventoryRepository.findAllHotelsWithAvailableInventory(today, pageable);
-        return hotelPage.map(hotel -> modelMapper.map(hotel, HotelDto.class));
+
+    @Override
+    public Page<HotelPriceDto> getAllHotels(Integer pageNo, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+
+        Page<HotelPriceDto> hotelPriceDtoPage = hotelMinPriceRepository.findAllHotelsWithAvailableInventory(LocalDate.now(),  pageable);
+        return hotelPriceDtoPage;
     }
 }
