@@ -94,5 +94,4 @@ public class PricingUpdateServiceIMPL implements PricingUpdateService {
         hotelMinPriceRepository.saveAll(hotelPrices);
 
     }
-
 }
