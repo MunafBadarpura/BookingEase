@@ -4,8 +4,10 @@ import com.munaf.airBnbApp.dtos.HotelDto;
 import com.munaf.airBnbApp.dtos.HotelInfoDto;
 import com.munaf.airBnbApp.dtos.RoomDto;
 import com.munaf.airBnbApp.entities.Hotel;
+import com.munaf.airBnbApp.entities.User;
 import com.munaf.airBnbApp.exceptions.InvalidInputException;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
+import com.munaf.airBnbApp.exceptions.UnAuthorisedException;
 import com.munaf.airBnbApp.repositories.HotelRepository;
 import com.munaf.airBnbApp.services.HotelService;
 import com.munaf.airBnbApp.services.InventoryService;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.munaf.airBnbApp.utils.UserUtils.getCurrentUser;
 
 @Service
 @Slf4j
@@ -38,6 +42,7 @@ public class HotelServiceIMPL implements HotelService {
         log.info("Creating a new hotel with name : {}", hotelDto.getName());
         Hotel hotel = modelMapper.map(hotelDto, Hotel.class);
         hotel.setActive(false);
+        hotel.setOwner(getCurrentUser());
         log.info("Created a new hotel with Id : {}", hotelDto.getId());
         return modelMapper.map(hotelRepository.save(hotel), HotelDto.class);
     }
@@ -55,6 +60,11 @@ public class HotelServiceIMPL implements HotelService {
         log.info("Updating a hotel with Id : {}", hotelId);
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId));
+
+        // CHECK THAT THIS HOTEL BELONGS TO CURRENT USER
+        User user = getCurrentUser();
+        if (!user.equals(hotel.getOwner())) throw new UnAuthorisedException("Hotel Does Not Belongs To This User With Id : " + user.getId());
+
         Boolean active = hotel.getActive();
         modelMapper.map(updateHotelDto, hotel);
         hotel.setId(hotelId);
@@ -71,8 +81,9 @@ public class HotelServiceIMPL implements HotelService {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId));
 
-        // Delete all future inventories
-        //hotel.getRooms().forEach(room -> inventoryService.deleteFutureInventories(room));
+        // CHECK THAT THIS HOTEL BELONGS TO CURRENT USER
+        User user = getCurrentUser();
+        if (!user.equals(hotel.getOwner())) throw new UnAuthorisedException("Hotel Does Not Belongs To This User With Id : " + user.getId());
 
         // Delete All rooms for this hotel
         hotel.getRooms().forEach(room -> roomService.deleteRoomByHotelIdAndRoomId(hotelId, room.getId()));
@@ -87,6 +98,11 @@ public class HotelServiceIMPL implements HotelService {
         log.info("Activating a hotel with Id : {}", hotelId);
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId));
+
+        // CHECK THAT THIS HOTEL BELONGS TO CURRENT USER
+        User user = getCurrentUser();
+        if (!user.equals(hotel.getOwner())) throw new UnAuthorisedException("Hotel Does Not Belongs To This User With Id : " + user.getId());
+
         if (hotel.getActive()) throw new InvalidInputException("Hotel Already Activated With Id : " + hotelId);
         hotel.setActive(true);
         hotel = hotelRepository.save(hotel);

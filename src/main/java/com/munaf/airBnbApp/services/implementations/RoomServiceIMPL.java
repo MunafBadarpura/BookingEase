@@ -3,7 +3,9 @@ package com.munaf.airBnbApp.services.implementations;
 import com.munaf.airBnbApp.dtos.RoomDto;
 import com.munaf.airBnbApp.entities.Hotel;
 import com.munaf.airBnbApp.entities.Room;
+import com.munaf.airBnbApp.entities.User;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
+import com.munaf.airBnbApp.exceptions.UnAuthorisedException;
 import com.munaf.airBnbApp.repositories.HotelRepository;
 import com.munaf.airBnbApp.repositories.RoomRepository;
 import com.munaf.airBnbApp.services.InventoryService;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.munaf.airBnbApp.utils.UserUtils.getCurrentUser;
 
 @Service
 @Slf4j
@@ -36,6 +40,10 @@ public class RoomServiceIMPL implements RoomService {
     public RoomDto createNewRoomInHotel(Long hotelId, RoomDto roomDto) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId));
+
+        // CHECK THAT THIS HOTEL BELONGS TO CURRENT USER
+        User user = getCurrentUser();
+        if (!user.equals(hotel.getOwner())) throw new UnAuthorisedException("Hotel Does Not Belongs To This User With Id : " + user.getId());
 
         Room room = modelMapper.map(roomDto, Room.class);
         room.setHotel(hotel);
@@ -75,6 +83,10 @@ public class RoomServiceIMPL implements RoomService {
     public Boolean deleteRoomByHotelIdAndRoomId(Long hotelId, Long roomId) {
         Room room = roomRepository.findByIdAndHotel_Id(roomId, hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room Not Found With Id : " + roomId + " For Hotel Id : " + hotelId));
+
+        // CHECK THAT THIS HOTEL BELONGS TO CURRENT USER
+        User user = getCurrentUser();
+        if (!user.equals(room.getHotel().getOwner())) throw new UnAuthorisedException("Room Does Not Belongs To This User With Id : " + user.getId());
 
         // Delete inventories for this room
         inventoryService.deleteAllInventoriesForRoom(room);

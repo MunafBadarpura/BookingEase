@@ -5,9 +5,11 @@ import com.munaf.airBnbApp.entities.*;
 import com.munaf.airBnbApp.entities.enums.BookingStatus;
 import com.munaf.airBnbApp.exceptions.InvalidInputException;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
+import com.munaf.airBnbApp.exceptions.UnAuthorisedException;
 import com.munaf.airBnbApp.repositories.*;
 import com.munaf.airBnbApp.services.BookingService;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +18,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
+import static com.munaf.airBnbApp.utils.UserUtils.getCurrentUser;
 
 @Service
 public class BookingServiceIMPL implements BookingService {
@@ -41,6 +43,7 @@ public class BookingServiceIMPL implements BookingService {
     @Override
     @Transactional
     public BookingDto initializeBooking(BookingRequest bookingRequest) {
+        User user = getCurrentUser();
         Hotel hotel = hotelRepository.findById(bookingRequest.getHotelId())
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found With Id : " + bookingRequest.getHotelId()));
         // HotelDto hotelDto = modelMapper.map(hotel, HotelDto.class);
@@ -64,12 +67,12 @@ public class BookingServiceIMPL implements BookingService {
         inventoryRepository.saveAll(inventories);
 
         // CREATE A BOOKING
-        UserDto userDto = modelMapper.map(getUser(), UserDto.class);
+        UserDto userDto = modelMapper.map(user, UserDto.class);
 
         Booking booking = Booking.builder()
                 .hotel(hotel)
                 .room(room)
-                .user(getUser())
+                .user(user)
                 .numberOfRooms(bookingRequest.getNumberOfRooms())
                 .bookingStatus(BookingStatus.RESERVED)
                 .checkInDate(bookingRequest.getCheckInDate())
@@ -92,12 +95,14 @@ public class BookingServiceIMPL implements BookingService {
     public BookingDto addGuestsToBooking(Long bookingId, List<GuestDto> guestDtoList) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking Not Found With Id : " + bookingId));
+        User user = getCurrentUser();
 
         if (hasBookingExpired(booking.getCreatedAt())) throw new IllegalStateException("Booking Has Been Already Expired");
+        if (!user.equals(booking.getUser())) throw new UnAuthorisedException("Booking Does Not Belongs To This User With Id : " + user.getId());
         if (booking.getBookingStatus() != BookingStatus.RESERVED) throw new IllegalStateException("Booking Is Not Under Reserved State");
 
         // ADD GUESTS IN BOOKING
-        UserDto userDto = modelMapper.map(getUser(), UserDto.class);
+        UserDto userDto = modelMapper.map(user, UserDto.class);
         List<Guest> guestList = guestDtoList.stream()
                 .map(guestDto -> {
                     guestDto.setUserDto(userDto);
@@ -126,11 +131,7 @@ public class BookingServiceIMPL implements BookingService {
         return createdAt.plusMinutes(10).isBefore(LocalDateTime.now()); // valid for 10 minutes
     }
 
-    public User getUser() {
-        User user = new User(); // TODO : REMOVE DUMMY USER
-        user.setId(1L);
-        return user;
-    }
+
 
 
 }
