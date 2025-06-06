@@ -26,7 +26,6 @@ public interface HotelMinPriceRepository extends JpaRepository<HotelMinPrice, Lo
             """)
     Page<HotelPriceDto> findHotelsWithAvailableInventory(
             @Param("city") String city,
-            @Param("numberOfRooms") Integer numberOfRooms,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("dateCount") Long dateCount,

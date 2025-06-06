@@ -40,6 +40,7 @@ public class HotelServiceIMPL implements HotelService {
     @Override //admin
     public HotelDto createNewHotel(HotelDto hotelDto) {
         log.info("Creating a new hotel with name : {}", hotelDto.getName());
+
         Hotel hotel = modelMapper.map(hotelDto, Hotel.class);
         hotel.setActive(false);
         hotel.setOwner(getCurrentUser());

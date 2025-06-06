@@ -61,6 +61,7 @@ public class RoomServiceIMPL implements RoomService {
     public List<RoomDto> getAllRoomByHotelId(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel Not Found With Id : " + hotelId));
+
         List<Room> rooms = hotel.getRooms();
         return rooms.stream()
                 .map(room -> modelMapper.map(room, RoomDto.class))
@@ -69,10 +70,6 @@ public class RoomServiceIMPL implements RoomService {
 
     @Override
     public RoomDto getRoomByHotelIdAndRoomId(Long hotelId, Long roomId) {
-//        Room room = roomRepository.findById(roomId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Room Not Found With Id : " + roomId));
-//        return modelMapper.map(room, RoomDto.class);
-
         Room room = roomRepository.findByIdAndHotel_Id(roomId, hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room Not Found With Id : " + roomId + " For Hotel Id : " + hotelId));
         return modelMapper.map(room, RoomDto.class);

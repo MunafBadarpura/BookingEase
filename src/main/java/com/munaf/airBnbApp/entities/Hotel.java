@@ -46,10 +46,11 @@ public class Hotel {
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
+    @JsonIgnore
     private User owner;
 
     @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-//    @JsonIgnore
+    @JsonIgnore
     private List<Room> rooms;
 
 

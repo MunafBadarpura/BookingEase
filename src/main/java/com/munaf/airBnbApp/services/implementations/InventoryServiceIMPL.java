@@ -92,7 +92,6 @@ public class InventoryServiceIMPL implements InventoryService {
 
         Page<HotelPriceDto> hotelPriceDtoPage = hotelMinPriceRepository.findHotelsWithAvailableInventory(
                 hotelSearchRequest.getCity(),
-                hotelSearchRequest.getNumberOfRooms(),
                 hotelSearchRequest.getStartDate(),
                 hotelSearchRequest.getEndDate(),
                 dateCount,

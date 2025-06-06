@@ -1,8 +1,10 @@
 package com.munaf.airBnbApp.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.munaf.airBnbApp.entities.enums.BookingStatus;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -12,10 +14,13 @@ public class BookingDto {
 
     private Long id;
 
-    // private HotelDto hotelDto;
+    @JsonProperty("hotel")
+    private HotelDto hotelDto;
 
-    // private RoomDto roomDto;
+    @JsonProperty("room")
+    private RoomDto roomDto;
 
+    @JsonProperty("user")
     private UserDto userDto;
 
     private Integer numberOfRooms; // roomCount
@@ -30,6 +35,9 @@ public class BookingDto {
 
     private LocalDateTime updatedAt;
 
+    @JsonProperty("guest")
     private Set<GuestDto> guestDtos;
+
+    private BigDecimal amount;
 
 }

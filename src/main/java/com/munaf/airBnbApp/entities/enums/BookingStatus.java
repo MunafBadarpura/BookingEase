@@ -1,12 +1,12 @@
-package com.munaf.airBnbApp.entities.enums;
 
+package com.munaf.airBnbApp.entities.enums;
 public enum BookingStatus {
 
     RESERVED,
     GUEST_ADDED,
     PAYMENT_PENDING,
     CONFIRMED,
-    CANCELED,
+    CANCELED, //CANCELLED,
     EXPIRED
 
 }

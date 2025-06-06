@@ -8,7 +8,6 @@ import java.time.LocalDate;
 public class HotelSearchRequest {
 
     private String city;
-    private Integer numberOfRooms;
     private LocalDate startDate;
     private LocalDate endDate;
 

@@ -2,10 +2,12 @@ package com.munaf.airBnbApp.advice;
 
 import com.munaf.airBnbApp.exceptions.InvalidInputException;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
+import com.munaf.airBnbApp.exceptions.UnAuthorisedException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -35,6 +37,14 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(apiError, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UnAuthorisedException.class)
+    public ResponseEntity<ApiResponse<?>> handleUnAuthorisedException(UnAuthorisedException e) {
+        ApiError apiError = ApiError.builder()
+                .message(e.getMessage())
+                .build();
+
+        return buildErrorResponseEntity(apiError, HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiResponse<?>> handleIllegalStateException(IllegalStateException e) {
@@ -72,6 +82,16 @@ public class GlobalExceptionHandler {
 
         return buildErrorResponseEntity(apiError, HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(InsufficientAuthenticationException.class)
+    public ResponseEntity<ApiResponse<?>> handleInsufficientAuthenticationException(Exception e) {
+        ApiError apiError = ApiError.builder()
+                .message("Unauthorized access: " + e.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError, HttpStatus.UNAUTHORIZED);
+    }
+
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handlerException(Exception e) {
