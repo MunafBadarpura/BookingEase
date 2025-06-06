@@ -18,7 +18,6 @@ server:
     context-path: /api/v1
 
 
-jwtSecretKey : thisisajwtkwy@12856@strong@32bit@key@213232423
 
 frontend:
   url: http://localhost:8080
