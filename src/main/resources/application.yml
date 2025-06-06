@@ -24,9 +24,3 @@ frontend:
   url: http://localhost:8080
 
 
-stripe:
-  secret:
-    key: KEY
-
-  webhook:
-    secret : KEY
