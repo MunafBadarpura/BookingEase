@@ -91,4 +91,23 @@ public class RoomServiceIMPL implements RoomService {
         roomRepository.deleteById(roomId);
         return true;
     }
+
+    @Override
+    @Transactional
+    public RoomDto updateRoomById(Long hotelId, Long roomId, RoomDto roomDto) {
+        Room room = roomRepository.findByIdAndHotel_Id(roomId, hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room Not Found With Id : " + roomId + " For Hotel Id : " + hotelId));
+
+        // CHECK THAT THIS HOTEL BELONGS TO CURRENT USER
+        User user = getCurrentUser();
+        if (!user.equals(room.getHotel().getOwner())) throw new UnAuthorisedException("Room Does Not Belongs To This User With Id : " + user.getId());
+
+        Room updatedRoom = modelMapper.map(roomDto, Room.class);
+        updatedRoom.setId(room.getId());
+        updatedRoom = roomRepository.save(updatedRoom);
+
+        // TODO : if totalCount is updated Then update inventory
+
+        return modelMapper.map(updatedRoom, RoomDto.class);
+    }
 }

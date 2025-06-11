@@ -104,7 +104,6 @@ public class BookingServiceIMPL implements BookingService {
         bookingDto.setUserDto(modelMapper.map(user, UserDto.class));
 
         return bookingDto;
-
     }
 
     @Override
@@ -116,6 +115,7 @@ public class BookingServiceIMPL implements BookingService {
 
         if (!user.equals(booking.getUser())) throw new UnAuthorisedException("Booking Does Not Belongs To This User With Id : " + user.getId());
         if (hasBookingExpired(booking.getCreatedAt())) throw new IllegalStateException("Booking Has Been Already Expired");
+        if (guestDtoList.size() > booking.getRoom().getCapacity()) throw new InvalidInputException("Guests Size Is Greater Than Room Capacity");
         if (booking.getBookingStatus() != BookingStatus.RESERVED) throw new IllegalStateException("Booking Is Not Under Reserved State");
 
         // ADD GUESTS IN BOOKING
@@ -177,7 +177,7 @@ public class BookingServiceIMPL implements BookingService {
             booking.setBookingStatus(BookingStatus.CONFIRMED);
             bookingRepository.save(booking);
 
-            inventoryRepository.findAndLockReservedInventory(booking.getRoom().getId(), booking.getCheckInDate(),
+            List<Inventory> lockReservedInventory = inventoryRepository.findAndLockReservedInventory(booking.getRoom().getId(), booking.getCheckInDate(),
                     booking.getCheckOutDate(), booking.getNumberOfRooms());
 
             // INCREASE BOOKED COUNT AND DECREASE RESERVED COUNT
@@ -204,7 +204,7 @@ public class BookingServiceIMPL implements BookingService {
         booking.setBookingStatus(BookingStatus.CANCELED);
         bookingRepository.save(booking);
 
-        inventoryRepository.findAndLockReservedInventory(booking.getRoom().getId(), booking.getCheckInDate(),
+        List<Inventory> lockReservedInventory = inventoryRepository.findAndLockReservedInventory(booking.getRoom().getId(), booking.getCheckInDate(),
                 booking.getCheckOutDate(), booking.getNumberOfRooms());
 
         inventoryRepository.cancelBooking(booking.getRoom().getId(), booking.getCheckInDate(),

@@ -1,14 +1,18 @@
 package com.munaf.airBnbApp.utils;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class PageModel<T> {
-
-    private T data;
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class PageModel {
+    private Object content;
     private Integer currentPageNumber;
     private Integer currentPageSize;
     private Integer totalPageNumber;
     private Long totalRecords;
-
 }

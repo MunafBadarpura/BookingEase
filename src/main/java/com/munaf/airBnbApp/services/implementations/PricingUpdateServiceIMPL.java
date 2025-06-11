@@ -41,9 +41,9 @@ public class PricingUpdateServiceIMPL implements PricingUpdateService {
     }
 
     // Schedular to update the Inventory and HotelMinPrice every 1 Hour
-    // @Scheduled(cron = "0 0 * * * *") // EVERY HOUR
     // @Scheduled(cron = "*/5 * * * * *") // EVERY 5 SECONDS
-    @Scheduled(cron = "0 */5 * * * *")// EVERY 5 MIN
+    // @Scheduled(cron = "0 */5 * * * *")// EVERY 5 MIN
+    @Scheduled(cron = "0 0 * * * *") // EVERY HOUR
     public void updatePrices() {
         int pageNo = 0;
         int pageSize = 100;

@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/admin/**").hasRole(Role.HOTEL_MANAGER.name());
                     auth.requestMatchers("/bookings/**").authenticated();
+                    auth.requestMatchers("/users/**").authenticated();
                     auth.requestMatchers("/auth/signup", "auth/login").anonymous(); //Allow not logged-in  users
                     auth.anyRequest().permitAll();
                 })

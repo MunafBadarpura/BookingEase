@@ -1,10 +1,16 @@
 package com.munaf.airBnbApp.controllers;
 
+import com.munaf.airBnbApp.dtos.BookingDto;
 import com.munaf.airBnbApp.dtos.HotelDto;
+import com.munaf.airBnbApp.dtos.HotelReportDto;
+import com.munaf.airBnbApp.entities.enums.BookingStatus;
 import com.munaf.airBnbApp.services.HotelService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("admin/hotels")
@@ -26,6 +32,11 @@ public class HotelController {
         return new ResponseEntity<>(hotelService.getHotelById(hotelId), HttpStatus.OK);
     }
 
+    @GetMapping()
+    public ResponseEntity<List<HotelDto>> getAllHotels() {
+        return new ResponseEntity<>(hotelService.getAllHotels(), HttpStatus.OK);
+    }
+
     @PutMapping("/{hotelId}")
     public ResponseEntity<HotelDto> updateHotelById(@PathVariable Long hotelId, @RequestBody HotelDto updateHotelDto) {
         return new ResponseEntity<>(hotelService.updateHotelById(hotelId, updateHotelDto), HttpStatus.OK);
@@ -42,4 +53,20 @@ public class HotelController {
         return new ResponseEntity<>(hotelService.activateHotel(hotelId), HttpStatus.OK);
     }
 
+
+    @GetMapping("{hotelId}/bookings")
+    public ResponseEntity<List<BookingDto>> getAllBookings(@PathVariable Long hotelId, @RequestParam(required = false) BookingStatus bookingStatus) {
+        System.out.println(bookingStatus);
+        return new ResponseEntity<>(hotelService.getAllBookings(hotelId, bookingStatus), HttpStatus.OK);
+    }
+
+    @GetMapping("{hotelId}/reports")
+    public ResponseEntity<HotelReportDto> getHotelReport(@PathVariable Long hotelId,
+                                                         @RequestParam(required = false) LocalDate startDate,
+                                                         @RequestParam(required = false) LocalDate endDate
+                                                         ) {
+        if (startDate == null) startDate =  LocalDate.now();
+        if (endDate == null)  endDate = LocalDate.now().plusMonths(1);
+        return new ResponseEntity<>(hotelService.getHotelReport(hotelId, startDate, endDate), HttpStatus.OK);
+    }
 }
