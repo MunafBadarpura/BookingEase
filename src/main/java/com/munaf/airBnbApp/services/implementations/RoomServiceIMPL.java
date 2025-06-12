@@ -2,11 +2,14 @@ package com.munaf.airBnbApp.services.implementations;
 
 import com.munaf.airBnbApp.dtos.RoomDto;
 import com.munaf.airBnbApp.entities.Hotel;
+import com.munaf.airBnbApp.entities.Inventory;
 import com.munaf.airBnbApp.entities.Room;
 import com.munaf.airBnbApp.entities.User;
+import com.munaf.airBnbApp.exceptions.InvalidInputException;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
 import com.munaf.airBnbApp.exceptions.UnAuthorisedException;
 import com.munaf.airBnbApp.repositories.HotelRepository;
+import com.munaf.airBnbApp.repositories.InventoryRepository;
 import com.munaf.airBnbApp.repositories.RoomRepository;
 import com.munaf.airBnbApp.services.InventoryService;
 import com.munaf.airBnbApp.services.RoomService;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.munaf.airBnbApp.utils.UserUtils.getCurrentUser;
 
@@ -26,12 +30,14 @@ public class RoomServiceIMPL implements RoomService {
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
     private final InventoryService inventoryService;
+    private final InventoryRepository inventoryRepository;
     private final ModelMapper modelMapper;
 
-    public RoomServiceIMPL(RoomRepository roomRepository, HotelRepository hotelRepository, InventoryService inventoryService, ModelMapper modelMapper) {
+    public RoomServiceIMPL(RoomRepository roomRepository, HotelRepository hotelRepository, InventoryService inventoryService, InventoryRepository inventoryRepository, ModelMapper modelMapper) {
         this.roomRepository = roomRepository;
         this.hotelRepository = hotelRepository;
         this.inventoryService = inventoryService;
+        this.inventoryRepository = inventoryRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -102,11 +108,20 @@ public class RoomServiceIMPL implements RoomService {
         User user = getCurrentUser();
         if (!user.equals(room.getHotel().getOwner())) throw new UnAuthorisedException("Room Does Not Belongs To This User With Id : " + user.getId());
 
+        // Checking That roomCount is updated Or Not
+        if (!Objects.equals(room.getTotalCount(), roomDto.getTotalCount())) {
+            List<Inventory> inventories = inventoryRepository.findByRoomId(roomId);
+            for (Inventory inventory : inventories) {
+                if (inventory.getBookedCount() > roomDto.getTotalCount()) throw new InvalidInputException("Room Can Not Updated Because Inventory Booked Count Is Greater Then Room Total Count");
+            }
+
+            inventoryRepository.updateInventoryTotalCountByRoomId(roomId, roomDto.getTotalCount());
+        }
+
         Room updatedRoom = modelMapper.map(roomDto, Room.class);
         updatedRoom.setId(room.getId());
         updatedRoom = roomRepository.save(updatedRoom);
 
-        // TODO : if totalCount is updated Then update inventory
 
         return modelMapper.map(updatedRoom, RoomDto.class);
     }

@@ -1,5 +1,6 @@
 package com.munaf.airBnbApp.advice;
 
+import com.munaf.airBnbApp.exceptions.BookingExpiredException;
 import com.munaf.airBnbApp.exceptions.InvalidInputException;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
 import com.munaf.airBnbApp.exceptions.UnAuthorisedException;
@@ -48,6 +49,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiResponse<?>> handleIllegalStateException(IllegalStateException e) {
+        ApiError apiError = ApiError.builder()
+                .message(e.getMessage())
+                .build();
+
+        return buildErrorResponseEntity(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BookingExpiredException.class)
+    public ResponseEntity<ApiResponse<?>> handleBookingExpiredException(BookingExpiredException e) {
         ApiError apiError = ApiError.builder()
                 .message(e.getMessage())
                 .build();

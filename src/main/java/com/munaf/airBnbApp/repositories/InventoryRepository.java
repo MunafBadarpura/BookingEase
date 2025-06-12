@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -170,4 +171,30 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
 
 
+    List<Inventory> findByRoomId(Long roomId);
+
+
+    @Modifying
+    @Query("""
+                UPDATE Inventory i
+                SET i.totalCount = :totalCount
+                WHERE i.room.id = :roomId
+            """)
+    void updateInventoryTotalCountByRoomId(Long roomId, Integer totalCount);
+
+
+
+    @Modifying
+    @Transactional
+    @Query("""
+                UPDATE Inventory i
+                SET i.reservedCount = i.reservedCount - :numberOfRooms
+                WHERE i.room.id = :roomId
+                  AND i.date BETWEEN :startDate AND :endDate
+                  AND i.reservedCount >= :numberOfRooms
+            """)
+    void expireBooking(@Param("roomId") Long roomId,
+                       @Param("startDate") LocalDate startDate,
+                       @Param("endDate") LocalDate endDate,
+                       @Param("numberOfRooms") int numberOfRooms);
 }

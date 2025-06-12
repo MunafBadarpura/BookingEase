@@ -23,3 +23,11 @@ frontend:
   url: http://localhost:8080
 
 
+jwtSecretKey : thisisajwtkwy@12856@strong@32bit@key@213232423
+
+stripe:
+  secret:
+    key: sk_test_51RVoZdCc51pkqkKba4bOiofQ3jni0JzngFHUaV6BRNgwCxOqUiWEJiqk4olliTD7E7iw5Blm10WX36OnrBkvgc0a00hodjDBeg
+
+  webhook:
+    secret : whsec_be50167cb37b3d7d1d1ff6a4e2a5671c50fa86fd8391775d65ac3113eab26b99

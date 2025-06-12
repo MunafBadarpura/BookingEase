@@ -3,6 +3,7 @@ package com.munaf.airBnbApp.services.implementations;
 import com.munaf.airBnbApp.dtos.*;
 import com.munaf.airBnbApp.entities.*;
 import com.munaf.airBnbApp.entities.enums.BookingStatus;
+import com.munaf.airBnbApp.exceptions.BookingExpiredException;
 import com.munaf.airBnbApp.exceptions.InvalidInputException;
 import com.munaf.airBnbApp.exceptions.ResourceNotFoundException;
 import com.munaf.airBnbApp.exceptions.UnAuthorisedException;
@@ -18,6 +19,9 @@ import com.stripe.param.RefundCreateParams;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
@@ -107,14 +112,23 @@ public class BookingServiceIMPL implements BookingService {
     }
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = BookingExpiredException.class)
     public BookingDto addGuestsToBooking(Long bookingId, List<GuestDto> guestDtoList) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking Not Found With Id : " + bookingId));
         User user = getCurrentUser();
 
         if (!user.equals(booking.getUser())) throw new UnAuthorisedException("Booking Does Not Belongs To This User With Id : " + user.getId());
-        if (hasBookingExpired(booking.getCreatedAt())) throw new IllegalStateException("Booking Has Been Already Expired");
+        if (hasBookingExpired(booking.getCreatedAt())) {
+            inventoryRepository.expireBooking(booking.getRoom().getId(),
+                            booking.getCheckInDate(),
+                            booking.getCheckOutDate(),
+                            booking.getNumberOfRooms()
+            );
+            booking.setBookingStatus(BookingStatus.EXPIRED);
+            bookingRepository.save(booking);
+            throw new BookingExpiredException("Booking Has Been Already Expired");
+        }
         if (guestDtoList.size() > booking.getRoom().getCapacity()) throw new InvalidInputException("Guests Size Is Greater Than Room Capacity");
         if (booking.getBookingStatus() != BookingStatus.RESERVED) throw new IllegalStateException("Booking Is Not Under Reserved State");
 
@@ -146,6 +160,7 @@ public class BookingServiceIMPL implements BookingService {
     }
 
     @Override
+    @Transactional(noRollbackFor = BookingExpiredException.class)
     public String initiateBookingPayment(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking Not Found With Id : " + bookingId));
@@ -153,7 +168,16 @@ public class BookingServiceIMPL implements BookingService {
         User user = getCurrentUser();
 
         if (!user.equals(booking.getUser())) throw new UnAuthorisedException("Booking Does Not Belongs To This User With Id : " + user.getId());
-        if (hasBookingExpired(booking.getCreatedAt())) throw new IllegalStateException("Booking Has Been Already Expired");
+        if (hasBookingExpired(booking.getCreatedAt())) {
+            inventoryRepository.expireBooking(booking.getRoom().getId(),
+                    booking.getCheckInDate(),
+                    booking.getCheckOutDate(),
+                    booking.getNumberOfRooms()
+            );
+            booking.setBookingStatus(BookingStatus.EXPIRED);
+            bookingRepository.save(booking);
+            throw new BookingExpiredException("Booking Has Been Already Expired");
+        }
 
         String sessionUrl = checkoutService.getCheckoutSession(booking, frontendUrl + "/payment/success", frontendUrl + "/payment/failure"); // payment url
         booking.setBookingStatus(BookingStatus.PAYMENT_PENDING);
@@ -242,5 +266,36 @@ public class BookingServiceIMPL implements BookingService {
         return createdAt.plusMinutes(10).isBefore(LocalDateTime.now()); // valid for 10 minutes
     }
 
+
+    // @Scheduled(cron = "*/5 * * * * *") // EVERY 5 SECONDS
+    @Scheduled(cron = "0 */15 * * * *") // every 15 mins
+    public void expireBooking() {
+        int pageNo = 0;
+        int pageSize = 100;
+
+        while (true) {
+            Page<Booking> bookingPage = bookingRepository.findAll(PageRequest.of(pageNo, pageSize));
+            if (bookingPage.isEmpty()) break; // if all records are done then exit loop
+
+            for (Booking booking : bookingPage.getContent()) {
+                if (hasBookingExpired(booking.getCreatedAt()) && !EnumSet.of(BookingStatus.CONFIRMED, BookingStatus.CANCELED, BookingStatus.EXPIRED).contains(booking.getBookingStatus())) {
+                    expireBookingStatus(booking);
+                }
+
+            }
+
+            pageNo++;
+        }
+    }
+
+    public void expireBookingStatus(Booking booking) {
+        inventoryRepository.expireBooking(booking.getRoom().getId(),
+                booking.getCheckInDate(),
+                booking.getCheckOutDate(),
+                booking.getNumberOfRooms()
+        );
+        booking.setBookingStatus(BookingStatus.EXPIRED);
+        bookingRepository.save(booking);
+    }
 
 }
