@@ -2,6 +2,7 @@ package com.munaf.airBnbApp.controllers;
 
 import com.munaf.airBnbApp.dtos.*;
 import com.munaf.airBnbApp.services.BookingService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +21,12 @@ public class HotelBookingController {
     }
 
     @PostMapping("/init")
-    public ResponseEntity<BookingDto> initializeBooking(@RequestBody BookingRequest bookingRequest) {
+    public ResponseEntity<BookingDto> initializeBooking(@RequestBody @Valid BookingRequest bookingRequest) {
         return new ResponseEntity<>(bookingService.initializeBooking(bookingRequest), HttpStatus.OK);
     }
 
     @PostMapping("/{bookingId}/addGuests")
-    public ResponseEntity<BookingDto> addGuestsToBooking(@PathVariable Long bookingId, @RequestBody List<GuestDto> guestDtoList) {
+    public ResponseEntity<BookingDto> addGuestsToBooking(@PathVariable Long bookingId, @RequestBody @Valid List<GuestDto> guestDtoList) {
         return new ResponseEntity<>(bookingService.addGuestsToBooking(bookingId, guestDtoList), HttpStatus.OK);
     }
 

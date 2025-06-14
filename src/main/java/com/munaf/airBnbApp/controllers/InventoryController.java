@@ -3,6 +3,7 @@ package com.munaf.airBnbApp.controllers;
 import com.munaf.airBnbApp.dtos.InventoryDto;
 import com.munaf.airBnbApp.dtos.UpdateInventoryRequestDto;
 import com.munaf.airBnbApp.services.InventoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class InventoryController {
     }
 
     @PatchMapping("/rooms/{roomId}")
-    public ResponseEntity<Void> updateInventories(@PathVariable Long roomId, @RequestBody UpdateInventoryRequestDto updateInventoryRequestDto) {
+    public ResponseEntity<Void> updateInventories(@PathVariable Long roomId, @RequestBody @Valid UpdateInventoryRequestDto updateInventoryRequestDto) {
         inventoryService.updateInventories(roomId, updateInventoryRequestDto);
         return ResponseEntity.noContent().build();
     }

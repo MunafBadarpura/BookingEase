@@ -79,6 +79,12 @@
 <!--	 28.2.0-->
 		</dependency>
 
+		<!--VALIDATION DEPENDENCY-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
 
 <!--		http://localhost:8080/api/v1/swagger-ui/index.html    -->
 		<dependency>

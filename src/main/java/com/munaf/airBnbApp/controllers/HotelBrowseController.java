@@ -7,6 +7,7 @@ import com.munaf.airBnbApp.dtos.HotelSearchRequest;
 import com.munaf.airBnbApp.services.HotelService;
 import com.munaf.airBnbApp.services.InventoryService;
 import com.munaf.airBnbApp.utils.PageModel;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class HotelBrowseController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<PageModel> searchHotel(@RequestBody HotelSearchRequest hotelSearchRequest,
+    public ResponseEntity<PageModel> searchHotel(@RequestBody @Valid HotelSearchRequest hotelSearchRequest,
                                                            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
                                                            @RequestParam(required = false, defaultValue = "10") Integer pageSize
                                       ) {

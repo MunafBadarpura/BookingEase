@@ -28,7 +28,8 @@ public class JwtService {
                 .claim("role", user.getRoles())
                 .claim("tokenType", "ACCESS")
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 *10)) // 10 min
+                //.expiration(new Date(System.currentTimeMillis() + 1000 * 60 *10)) // 10 min TODO : use 10 min
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 3)) // 3 days // just for testing
                 .signWith(getSecretKey())
                 .compact();
     }

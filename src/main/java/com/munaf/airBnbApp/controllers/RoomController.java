@@ -2,6 +2,7 @@ package com.munaf.airBnbApp.controllers;
 
 import com.munaf.airBnbApp.dtos.RoomDto;
 import com.munaf.airBnbApp.services.RoomService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class RoomController {
     }
 
     @PostMapping
-    ResponseEntity<RoomDto> createNewRoomInHotel(@PathVariable Long hotelId, @RequestBody RoomDto roomDto){
+    ResponseEntity<RoomDto> createNewRoomInHotel(@PathVariable Long hotelId, @RequestBody @Valid RoomDto roomDto){
         return new ResponseEntity<>(roomService.createNewRoomInHotel(hotelId, roomDto), HttpStatus.CREATED);
     }
 
@@ -40,7 +41,7 @@ public class RoomController {
     }
 
     @PutMapping("/{roomId}")
-    ResponseEntity<RoomDto> updateRoomById(@PathVariable Long hotelId, @PathVariable Long roomId, @RequestBody RoomDto roomDto) {
+    ResponseEntity<RoomDto> updateRoomById(@PathVariable Long hotelId, @PathVariable Long roomId, @RequestBody @Valid RoomDto roomDto) {
         return new ResponseEntity<>(roomService.updateRoomById(hotelId, roomId, roomDto), HttpStatus.OK);
     }
 

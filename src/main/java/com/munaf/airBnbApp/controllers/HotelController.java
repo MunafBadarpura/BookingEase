@@ -5,6 +5,7 @@ import com.munaf.airBnbApp.dtos.HotelDto;
 import com.munaf.airBnbApp.dtos.HotelReportDto;
 import com.munaf.airBnbApp.entities.enums.BookingStatus;
 import com.munaf.airBnbApp.services.HotelService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class HotelController {
     }
 
     @PostMapping()
-    public ResponseEntity<HotelDto> createNewHotel(@RequestBody HotelDto hotelDto) {
+    public ResponseEntity<HotelDto> createNewHotel(@RequestBody @Valid HotelDto hotelDto) {
         return new ResponseEntity<>(hotelService.createNewHotel(hotelDto), HttpStatus.CREATED);
     }
 
@@ -38,7 +39,7 @@ public class HotelController {
     }
 
     @PutMapping("/{hotelId}")
-    public ResponseEntity<HotelDto> updateHotelById(@PathVariable Long hotelId, @RequestBody HotelDto updateHotelDto) {
+    public ResponseEntity<HotelDto> updateHotelById(@PathVariable Long hotelId, @RequestBody @Valid HotelDto updateHotelDto) {
         return new ResponseEntity<>(hotelService.updateHotelById(hotelId, updateHotelDto), HttpStatus.OK);
     }
 

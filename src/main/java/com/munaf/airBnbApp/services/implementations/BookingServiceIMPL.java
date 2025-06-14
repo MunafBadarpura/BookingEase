@@ -85,7 +85,6 @@ public class BookingServiceIMPL implements BookingService {
                 bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate(), bookingRequest.getNumberOfRooms());
 
         // CREATE A BOOKING
-
         BigDecimal priceForOneRoom = pricingService.calculateTotalPrice(inventories); // amount for 1 room
         BigDecimal totalPrice = priceForOneRoom.multiply(BigDecimal.valueOf(bookingRequest.getNumberOfRooms())); // amount for total room
 
@@ -283,7 +282,6 @@ public class BookingServiceIMPL implements BookingService {
                 }
 
             }
-
             pageNo++;
         }
     }
