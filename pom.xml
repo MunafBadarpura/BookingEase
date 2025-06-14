@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.munaf</groupId>
-	<artifactId>airBnbApp</artifactId>
+	<artifactId>bookingEase</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>airBnbApp</name>
-	<description>AirBnb Backend In Spring Boot</description>
+	<name>bookingEase</name>
+	<description>Hotel Management And Booking System Like AirBnb</description>
 	<url/>
 	<licenses>
 		<license/>

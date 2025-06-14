@@ -1,8 +1,8 @@
 spring:
   application:
-    name: airBnbApp
+    name: bookingEase
   datasource:
-    url: jdbc:postgresql://localhost:5432/airBnb
+    url: jdbc:postgresql://localhost:5432/bookingEase
     username: postgres
     password: root
   jpa:
