@@ -1,6 +1,6 @@
 # 🏨 BookingEase - Hotel Booking System
 
-BookingEase is a full-stack **Spring Boot-based RESTful Hotel Booking System** designed for modern hotel management and user-friendly booking experiences. It supports dynamic pricing, secure authentication, role-based access, and seamless Stripe integration for payments.
+BookingEase is a **Spring Boot-based RESTful Hotel Booking System** designed for modern hotel management and user-friendly booking experiences. It supports dynamic pricing, secure authentication, role-based access, and seamless Stripe integration for payments.
 
 ---
 
