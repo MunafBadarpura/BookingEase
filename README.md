@@ -189,7 +189,6 @@ public void updatePrices() {
 
 ## 📜 License
 
-This project is licensed under the **MIT License**.  
-Feel free to **fork**, **modify**, and **use** it in your own projects.
+This project is licensed under the [MIT License](LICENSE). 
 
 ---
