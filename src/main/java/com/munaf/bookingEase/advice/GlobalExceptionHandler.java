@@ -1,4 +1,4 @@
-package com.munaf.bookingEase.advice;
+package com.munaf.bookingEase.advices;
 
 import com.munaf.bookingEase.exceptions.BookingExpiredException;
 import com.munaf.bookingEase.exceptions.InvalidInputException;

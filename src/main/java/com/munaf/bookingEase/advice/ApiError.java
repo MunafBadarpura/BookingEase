@@ -1,4 +1,4 @@
-package com.munaf.bookingEase.advice;
+package com.munaf.bookingEase.advices;
 
 import lombok.Builder;
 import lombok.Data;
