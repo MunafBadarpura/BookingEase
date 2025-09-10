@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PageModelUtil {
+public class PageModel {
     private Object content;
     private Integer currentPageNumber;
     private Integer currentPageSize;

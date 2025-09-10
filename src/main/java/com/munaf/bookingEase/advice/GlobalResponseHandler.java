@@ -1,4 +1,4 @@
-package com.munaf.bookingEase.advices;
+package com.munaf.bookingEase.advice;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;

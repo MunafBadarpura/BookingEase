@@ -6,6 +6,7 @@ import com.munaf.bookingEase.services.HotelService;
 import com.munaf.bookingEase.services.InventoryService;
 import com.munaf.bookingEase.utils.PageModel;
 import jakarta.validation.Valid;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

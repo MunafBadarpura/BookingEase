@@ -10,7 +10,6 @@ import lombok.Data;
 @Data
 public class HotelDto {
 
-    @NotNull(message = "Hotel ID is required")
     private Long id;
 
     @NotBlank(message = "Hotel name is required")

@@ -144,7 +144,6 @@ strategy = new OccupancyPricingStrategy(strategy);
 strategy = new UrgencyPricingStrategy(strategy);
 strategy = new HolidayPricingStrategy(strategy);
 BigDecimal finalPrice = strategy.calculatePrice(inventory);
-
 ```
 ## ⏲️ Scheduled Tasks
 
@@ -168,13 +167,14 @@ public void updatePrices() {
 
 ## 🧠 Tech Stack
 
-- **Java 17**  
-- **Spring Boot**  
+- **Java 21**  
+- **Spring Boot 3**  
 - **Spring Security (JWT)**  
 - **Stripe API** – for handling payments  
-- **MySQL / PostgreSQL** – flexible database support  
+- **PostgresSQL** – flexible database support  
 - **Lombok** – for reducing boilerplate code  
-- **Scheduled Tasks** – for automated operations like expiring unpaid bookings and updating room pricing
+- *
+- *Scheduled Tasks** – for automated operations like expiring unpaid bookings and updating room pricing
 
 ---
 
